@@ -3,9 +3,30 @@
 	<head>
 		<title>hello</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="https://code.jquery.com/jquery-latest.min.js"></script>
+		<script src="http://localhost:8080/js/main.js"></script>
+		<script>
+			$('.test-btn').on('click', function(){
+			   alert("ddd");
+			});
+		</script>
+		
 	</head>
 	<body>
-		<p th:text="'안녕하세요. '+${data} " />
+		
+		<p><a href="/">back</a></p>
+		<p><a href="/" target="_blank">1.프린트 출력하기  </a></p>
+		<p><a href="/" target="_blank">2.프린트 스캔하기 </a></p>
+		<p><a href="/" target="_blank">3.이미지 올리기</a></p>
+		<p><a href="/" target="_blank">4.텍스트 추출 해서 글자로 변환 </a></p>
+		<p><a href="/" target="_blank">5.결과값 확인 </a></p>
+		<p><a href="/" target="_blank">6.결과물 출력</a></p>
+		
+		
+		<button class="test-btn">버튼</button>
+		
+		<p><a href="https://scontent-gmp1-1.xx.fbcdn.net/v/t1.6435-9/90560345_3009242059140280_746351048439889920_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_ohc=HXgALtTC39gQ7kNvgFhJWeB&_nc_ht=scontent-gmp1-1.xx&oh=00_AYDLWGDVRvc_dd04fqzbNUde8HWAC4dEgHpmHZyozk568g&oe=669F4795" target="_blank" >분석할 그림 소스</a></p>
+		
 	</body>
 
 </html>

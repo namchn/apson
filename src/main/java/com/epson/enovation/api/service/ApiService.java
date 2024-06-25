@@ -1,5 +1,11 @@
 package com.epson.enovation.api.service;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -295,7 +301,8 @@ public HashMap<String, Object> refresh(HttpSession session , String requestURL) 
 
 public HashMap<String, Object> capability(HttpSession session ,String requestURL)  {
 
-		requestURL = "https://{hostname}/api/1/printing/printers/{deviceId}/capability/document?";
+		//requestURL = "https://{hostname}/api/1/printing/printers/{deviceId}/capability/document?";
+		requestURL = "https://{hostname}/api/1/printing/printers/{deviceId}/capability/photo?";
 		requestURL = requestURL.replace("{hostname}",APIConfig.hostname);
 		requestURL = requestURL.replace("{deviceId}",(String)session.getAttribute("deviceId"));
 		
@@ -510,7 +517,8 @@ public HashMap<String, Object> setting(HttpSession session ,String requestURL)  
             // JSON 객체 선언 
          	JSONObject parameter = new JSONObject();
          	parameter.put("job_name","sample");
-         	parameter.put("print_mode","document");
+         	//parameter.put("print_mode","document");
+         	parameter.put("print_mode","photo");
          	//parameter.put("print_setting",parameter1);
             
             
@@ -573,11 +581,15 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
 
 		//requestURL = "{upload_uri}/File=1.{extension}";
 		//requestURL = "https://www.epsonconnect.com/c33fe124ef80c3b13670be27a6b0bcd7/v1/storage/PostData?Key=7ba2f33e17536d943896fff35b3e16c88e55f79d64356e339bdbab4f5ae680e8b9aa339c473be300/File=1.txt";
-		requestURL = "{uploadUri}";
+		//requestURL = "{uploadUri}";
+		//requestURL = "{uploadUri}/File=1.{extension}";
+		requestURL = "{uploadUri}&File=1.{extension}";
 		//requestURL = "https://www.epsonconnect.com/c33fe124ef80c3b13670be27a6b0bcd7/v1/storage/PostData?";
 		
 		requestURL = requestURL.replace("{hostname}",APIConfig.hostname);
 		requestURL = requestURL.replace("{uploadUri}",(String)session.getAttribute("uploadUri"));
+		//requestURL = requestURL.replace("{extension}","txt");
+		
 		
 		//Spring restTemplate
         HashMap<String, Object> result = new HashMap<String, Object>();
@@ -615,15 +627,50 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
             //String usernamme = DEVICE;
             //String password ="";
 
+            //File file = new File("d:/epsonprint.txt");
+            requestURL = requestURL.replace("{extension}","jpg");
+            File file = new File("d:\\bom.jpg");
+            FileInputStream fis= new FileInputStream(file);
+            byte[] byteBuff = new byte[9999];
+            System.out.println("!byteBuff[0]: " + byteBuff[0]);
+			System.out.println("!byteBuff[1]: " + byteBuff[1]);
+			System.out.println("!byteBuff[2]: " + byteBuff[2]);
+			System.out.println("!byteBuff[3]: " + byteBuff[3]);
+			System.out.println("!byteBuff[4]: " + byteBuff[4]);
+
+			// 파일을 읽고 읽은 크기를 nRLen 에 저장한다.
+			int nRLen = fis.read(byteBuff);
+			System.out.println("nRLen : " + nRLen);
+			System.out.println("byteBuff[0]: " + byteBuff[0]);
+			System.out.println("byteBuff[1]: " + byteBuff[1]);
+			System.out.println("byteBuff[2]: " + byteBuff[2]);
+			System.out.println("byteBuff[3]: " + byteBuff[3]);
+			System.out.println("byteBuff[4]: " + byteBuff[4]);
+			
+            
+            BufferedReader reader = new BufferedReader(    new InputStreamReader(new FileInputStream("d:\\epsonprint.txt"), "UTF-8"));
+            
+            byte[] bytes = Files.readAllBytes(Paths.get("d:\\epsonprint.txt"));
+            String str = Files.readString(Paths.get("d:\\epsonprint.txt"));
+            
+            //String str2 = Files.readString(Paths.get("d:\\epsonprint.docx"));
+            //requestURL = requestURL.replace("{extension}","docx");
+            System.out.println("str : " + str);
+            
+            bytes = str.getBytes();
+            
             String main = "혹시 이거 프린터 되시나요?? \r\n"
             		+ "\r\n"
             		+ "확인 되시면 카톡 부탁드립니다.\r\n"
             		+ "\r\n"
             		+ "from 남천우.";
+            System.out.println("length : "+String.valueOf(str.getBytes().length));
             
-            headers.set("Content-Length", String.valueOf(main.getBytes().length) );
-            headers.set("Content-Type", "application/octet-stream");
-            //headers.set("Content-Type", "text/plain; charset=utf-8");
+            //headers.set("Content-Length", String.valueOf(str.getBytes().length) );
+            headers.set("Content-Length", String.valueOf(nRLen) );
+            //headers.set("Content-Type", "application/octet-stream");
+            headers.set("Content-Type", "image/jpeg");
+            //headers.set("Content-Type", "application/pdf; charset=utf-8");
             
             //headers.setBasicAuth(CLIENT_ID, SECRET);
             //headers.set("Authorization", "Basic "+auth);
@@ -658,7 +705,9 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
             
             //HttpEntity<?> entity = new HttpEntity<>(headers);
             //HttpEntity<?> entity = new HttpEntity<>(body,headers);
-            HttpEntity<?> entity = new HttpEntity<>(main,headers);
+            //HttpEntity<?> entity = new HttpEntity<>(main,headers);
+            //HttpEntity<?> entity = new HttpEntity<>(bytes,headers);
+            HttpEntity<?> entity = new HttpEntity<>(byteBuff,headers);
             //UriComponents uri = UriComponentsBuilder.fromHttpUrl(requestURL).build();
             UriComponents uri = builder.build();
             System.out.println("uri string: " + uri);
@@ -666,7 +715,7 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
 
             
             System.out.println("resultMap string: " + resultMap);
-            System.out.println(resultMap);
+            //System.out.println(resultMap);
             
             result.put("statusCode", resultMap.getStatusCodeValue()); //http status code를 확인
             result.put("header", resultMap.getHeaders()); //헤더 정보 확인
@@ -718,40 +767,41 @@ public HashMap<String, Object> execute(HttpSession session ,String requestURL)  
             
             //
             MultiValueMap<String,String> body = new LinkedMultiValueMap<String,String>();
-            String	hostname = "api.epsonconnect.com";
-            String ACCEPT = "application/json; charset=utf-8";
-            String CLIENT_ID = "1af87bb5aad845d2bd425d50aae44c8a";
-            String SECRET = "qXx4bVcjm65r6qSb5sr6SUj3VgmUNagZVGZwtHn2ta7rdZZaxsg7CJRz5riCYT1I";
-            String DEVICE ="qut6038ye0ni75@print.epsonconnect.com";  //프린터이메일 주소
+            //String	hostname = "api.epsonconnect.com";
+            //String ACCEPT = "application/json; charset=utf-8";
+            //String CLIENT_ID = "1af87bb5aad845d2bd425d50aae44c8a";
+            //String SECRET = "qXx4bVcjm65r6qSb5sr6SUj3VgmUNagZVGZwtHn2ta7rdZZaxsg7CJRz5riCYT1I";
+            //String DEVICE ="qut6038ye0ni75@print.epsonconnect.com";  //프린터이메일 주소
             
             //String uri_str = 
             //webApiUri=https://api.epsonconnect.com/api/1/printing/ {%resource%} 
            
-            String teststr= CLIENT_ID+":"+SECRET;
+            //String teststr= CLIENT_ID+":"+SECRET;
             //byte[] testBytes = teststr.getBytes();
             
-            String encodedStr = Base64.getEncoder().encodeToString(teststr.getBytes());
-            System.out.println("encoded string: " + encodedStr);
+            //String encodedStr = Base64.getEncoder().encodeToString(teststr.getBytes());
+            //System.out.println("encoded string: " + encodedStr);
             
-            byte[] decodedBytes = Base64.getDecoder().decode(encodedStr);
-            String decodedStr = new String(decodedBytes);
-            System.out.println("decoded string: " + decodedStr);
+            //byte[] decodedBytes = Base64.getDecoder().decode(encodedStr);
+            //String decodedStr = new String(decodedBytes);
+            //System.out.println("decoded string: " + decodedStr);
             //String auth = encodedStr;
-            String auth = decodedStr;
-            String grant_type = "refresh_token";
-            String refresh_token = "NTEkTiRDnuPzPL7KcNMyZx7iu2s0tnmPFIY6oCs3IYK48SXj23PohYoEO1ViQzQB";
-            String usernamme = DEVICE;
-            String password ="";
+            //String auth = decodedStr;
+           // String grant_type = "refresh_token";
+            //String refresh_token = "NTEkTiRDnuPzPL7KcNMyZx7iu2s0tnmPFIY6oCs3IYK48SXj23PohYoEO1ViQzQB";
+            //String usernamme = DEVICE;
+            //String password ="";
 
             
-            String access_token = "GIXyt1yi4h8YPz6SV5SdDPfAySVwVU1QYkezGHEhNvbGn9XLdD8nExWKeA4h4Eqr";
+            //String access_token = "GIXyt1yi4h8YPz6SV5SdDPfAySVwVU1QYkezGHEhNvbGn9XLdD8nExWKeA4h4Eqr";
 
-            headers.setBearerAuth(access_token);
+            headers.setBearerAuth((String)session.getAttribute("accessToken"));
             //headers.set("Authorization", "Basic "+auth);
             //headers.set("Authorization", "Basic "+teststr);
             //headers.set("Authorization", auth);
             //headers.set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             headers.set("Content-Type", "application/json; charset=utf-8");
+            //headers.set("Content-Type", "application/plain; charset=utf-8");
             //headers.set("Accept", ACCEPT);
             //
             
@@ -777,7 +827,7 @@ public HashMap<String, Object> execute(HttpSession session ,String requestURL)  
             //HttpEntity<?> entity = new HttpEntity<>(body,headers);
             //UriComponents uri = UriComponentsBuilder.fromHttpUrl(requestURL).build();
             UriComponents uri = builder.build();
-            //System.out.println("uri string: " + uri);
+            System.out.println("uri string: " + uri);
             ResponseEntity<?> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.POST, entity, Object.class);
 
             

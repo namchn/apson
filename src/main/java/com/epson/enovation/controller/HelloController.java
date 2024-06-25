@@ -29,4 +29,11 @@ public class HelloController {
 		return "hello";
 	}
 	
+	@GetMapping("hello2")
+	public String hello2(Model model) {
+		model.addAttribute("data" ,"aa");
+		model.addAttribute("host" ,"http://localhost:8080");
+		return "hello2";
+	}
+	
 }
