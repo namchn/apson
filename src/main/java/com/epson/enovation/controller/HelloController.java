@@ -36,4 +36,11 @@ public class HelloController {
 		return "hello2";
 	}
 	
+	@GetMapping("hello3")
+	public String hello3(Model model) {
+		model.addAttribute("data" ,"aa");
+		model.addAttribute("host" ,"http://localhost:8080");
+		return "hello3";
+	}
+	
 }
