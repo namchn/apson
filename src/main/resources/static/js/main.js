@@ -35,8 +35,21 @@ $(document).ready(function() {
 	
 	
 	
-	$('#header').on('click', function(){
-		console.log('daul.!');
+	$('#loginAction').on('click', function(){
+		//console.log('로그인 되었습니다.');
+		alert('로그인 되었습니다.');
+	});
+	$('#printAction').on('click', function(){
+		//console.log('로그인 되었습니다.');
+		alert('프린트하였습니다.');
+	});
+	$('#scanAction').on('click', function(){
+		//console.log('로그인 되었습니다.');
+		alert('스캔되었습니다.');
+	});
+	$('#solutionAction').on('click', function(){
+		//console.log('로그인 되었습니다.');
+		alert('문제가 분석되었습니다.');
 	});
 		
 	
