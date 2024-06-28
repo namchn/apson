@@ -13,6 +13,7 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -28,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.epson.enovation.model.APIConfig;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 
@@ -40,7 +42,8 @@ public class ApiService {
 	//	this.aws = get(requestURL);
 	//}
 	
-
+	@Value("${spring.application.name}")
+	private String name;
 	
 	//@Autowired
 	//private APIConfig apiConfig;
@@ -166,7 +169,7 @@ public HashMap<String, Object> auth(String requestURL)  {
             
             //result.put("all", resultMap); //실제 데이터 정보 확인
             
-
+            System.out.println("!!!!!!!!!!!!!name : " + name);	
             //에러처리해야댐
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             result.put("statusCode", e.getRawStatusCode());
@@ -577,7 +580,7 @@ public HashMap<String, Object> setting(HttpSession session ,String requestURL)  
 
 
 
-public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
+public HashMap<String, Object> upload(HttpSession session ,String param,String requestURL)  {
 
 		//requestURL = "{upload_uri}/File=1.{extension}";
 		//requestURL = "https://www.epsonconnect.com/c33fe124ef80c3b13670be27a6b0bcd7/v1/storage/PostData?Key=7ba2f33e17536d943896fff35b3e16c88e55f79d64356e339bdbab4f5ae680e8b9aa339c473be300/File=1.txt";
@@ -629,7 +632,41 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
 
             //File file = new File("d:/epsonprint.txt");
             requestURL = requestURL.replace("{extension}","jpg");
-            File file = new File("d:\\bom.jpg");
+            
+            //param
+            	File file;
+            if(param.equals("problem")) {
+            	//File file2 = new File(".");
+                //String rootPath = file2.getAbsolutePath();
+                String rootPath = System.getProperty("user.dir");
+                String pass = rootPath+"/"+param+".jpg";
+                //pass=pass.replaceAll("\\", "/");
+                System.out.println("1현재 프로젝트의 경로 : "+ pass );
+            	file = new File(pass);
+            }else if(param.equals("bom")){
+            	String rootPath = System.getProperty("user.dir");
+                String pass = rootPath+"/"+param+".jpg";
+                System.out.println("2현재 프로젝트의 경로 : "+pass );
+            	file = new File(pass);
+            }else {
+            	String rootPath = System.getProperty("user.dir");
+                String pass = rootPath+"/"+param+".jpg";
+                System.out.println("2현재 프로젝트의 경로 : "+pass );
+            	file = new File(pass);
+            	//file = new File("d:\\bom.jpg");
+            }
+            
+            
+            // 파일 존재 여부 확인
+            if (file.exists()) {
+                // 파일이 존재할 때만 처리
+                System.out.println("파일이 존재합니다: " + file.getAbsolutePath());
+            } else {
+                System.out.println("파일이 존재하지 않습니다: " + file.getAbsolutePath());
+                // 예외 처리 또는 대체 로직
+            }
+            
+            
             FileInputStream fis= new FileInputStream(file);
             byte[] byteBuff = new byte[9999];
             System.out.println("!byteBuff[0]: " + byteBuff[0]);
@@ -648,23 +685,23 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
 			System.out.println("byteBuff[4]: " + byteBuff[4]);
 			
             
-            BufferedReader reader = new BufferedReader(    new InputStreamReader(new FileInputStream("d:\\epsonprint.txt"), "UTF-8"));
+            //BufferedReader reader = new BufferedReader(    new InputStreamReader(new FileInputStream("d:\\epsonprint.txt"), "UTF-8"));
             
-            byte[] bytes = Files.readAllBytes(Paths.get("d:\\epsonprint.txt"));
-            String str = Files.readString(Paths.get("d:\\epsonprint.txt"));
+            //byte[] bytes = Files.readAllBytes(Paths.get("d:\\epsonprint.txt"));
+            //String str = Files.readString(Paths.get("d:\\epsonprint.txt"));
             
             //String str2 = Files.readString(Paths.get("d:\\epsonprint.docx"));
             //requestURL = requestURL.replace("{extension}","docx");
-            System.out.println("str : " + str);
+            //System.out.println("str : " + str);
             
-            bytes = str.getBytes();
+            //bytes = str.getBytes();
             
             String main = "혹시 이거 프린터 되시나요?? \r\n"
             		+ "\r\n"
             		+ "확인 되시면 카톡 부탁드립니다.\r\n"
             		+ "\r\n"
             		+ "from 남천우.";
-            System.out.println("length : "+String.valueOf(str.getBytes().length));
+            //System.out.println("length : "+String.valueOf(str.getBytes().length));
             
             //headers.set("Content-Length", String.valueOf(str.getBytes().length) );
             headers.set("Content-Length", String.valueOf(nRLen) );
@@ -691,9 +728,9 @@ public HashMap<String, Object> upload(HttpSession session ,String requestURL)  {
             
             //
          // 쿼리 파라미터 구성
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestURL)
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestURL);
             		//.queryParam("Key", "883fe77fc6a8186138872ead119c34bad1ee232f697157651a5a476120e04d967640097e5603a388")
-            		.queryParam("File", "1.txt");
+            		//.queryParam("File", "1.txt");
             		//.queryParam("subject", "printer");
             		//.queryParam("subject", "printer")
                     //.queryParam("grant_type", "password")
@@ -865,10 +902,8 @@ public HashMap<String, Object> execute(HttpSession session ,String requestURL)  
 
 
 
-public HashMap<String, Object> ocr(String requestURL)  {
-
-		requestURL = "https://17qnafdcfp.apigw.ntruss.com/custom/v1/32035/3c7799e6abb918f55f45990bc03cc41ef387565b635c4458df60d04a4b71a2f4/general";
-	
+public HashMap<String, Object> ocr(HttpSession session, String imgurl,String requestURL)  {
+		
 		//Spring restTemplate
         HashMap<String, Object> result = new HashMap<String, Object>();
 		//ResponseEntity<Object> resultMap = new ResponseEntity<>(null,null,200);
@@ -878,34 +913,8 @@ public HashMap<String, Object> ocr(String requestURL)  {
 
             HttpHeaders headers = new HttpHeaders();
             
-            //
             MultiValueMap<String,Object> body = new LinkedMultiValueMap<String,Object>();
-            String	hostname = "api.epsonconnect.com";
-            String ACCEPT = "application/json; charset=utf-8";
-            String CLIENT_ID = "1af87bb5aad845d2bd425d50aae44c8a";
-            String SECRET = "qXx4bVcjm65r6qSb5sr6SUj3VgmUNagZVGZwtHn2ta7rdZZaxsg7CJRz5riCYT1I";
-            String DEVICE ="qut6038ye0ni75@print.epsonconnect.com";  //프린터이메일 주소
-            
-            //String uri_str = 
-            //webApiUri=https://api.epsonconnect.com/api/1/printing/ {%resource%} 
-           
-            String teststr= CLIENT_ID+":"+SECRET;
-            //byte[] testBytes = teststr.getBytes();
-            
-            String encodedStr = Base64.getEncoder().encodeToString(teststr.getBytes());
-            System.out.println("encoded string: " + encodedStr);
-            
-            byte[] decodedBytes = Base64.getDecoder().decode(encodedStr);
-            String decodedStr = new String(decodedBytes);
-            System.out.println("decoded string: " + decodedStr);
-            //String auth = encodedStr;
-            String auth = decodedStr;
-            String grant_type = "refresh_token";
-            String refresh_token = "NTEkTiRDnuPzPL7KcNMyZx7iu2s0tnmPFIY6oCs3IYK48SXj23PohYoEO1ViQzQB";
-            String usernamme = DEVICE;
-            String password ="";
-            String access_token = "GIXyt1yi4h8YPz6SV5SdDPfAySVwVU1QYkezGHEhNvbGn9XLdD8nExWKeA4h4Eqr";
-
+          
             //headers.setBearerAuth(access_token);
             //headers.setBasicAuth(CLIENT_ID, SECRET);
             //headers.set("Authorization", "Basic "+auth);
@@ -914,12 +923,10 @@ public HashMap<String, Object> ocr(String requestURL)  {
             //headers.set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
             //headers.set("Content-Type", "application/json; charset=UTF-8");
             headers.set("Content-Type", "application/json");
-            headers.set("X-OCR-SECRET", "QlREdlJzYUJMU3BybmNGSGVOTHF6bWpzWUJ3ZXNYRlY=");
+            headers.set("X-OCR-SECRET", APIConfig.XOCRSECRET );
             
             //headers.set("Accept", ACCEPT);
             //
-            
-
             JSONObject print_setting = new JSONObject();
             print_setting.put("media_size","ms_a4");
             print_setting.put("media_type","mt_plainpaper");
@@ -952,7 +959,7 @@ public HashMap<String, Object> ocr(String requestURL)  {
             body.add("job_name","sample");
             body.add("print_mode","document");
             body.add("print_setting",print_setting);
-            body.add("print_setting",aa);
+            //body.add("print_setting",aa);
             
             System.out.println("body string: " + body);
             
@@ -961,7 +968,7 @@ public HashMap<String, Object> ocr(String requestURL)  {
             parameter1.put("format", "png");
             parameter1.put("name", "medium");
             parameter1.put("data", null);
-            parameter1.put("url", "https://scontent-gmp1-1.xx.fbcdn.net/v/t1.6435-9/90560345_3009242059140280_746351048439889920_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_ohc=HXgALtTC39gQ7kNvgFhJWeB&_nc_ht=scontent-gmp1-1.xx&oh=00_AYDLWGDVRvc_dd04fqzbNUde8HWAC4dEgHpmHZyozk568g&oe=669F4795");
+            parameter1.put("url", imgurl);
             JSONArray array = new JSONArray();
             array.add(parameter1);
             

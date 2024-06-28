@@ -26,6 +26,23 @@
 		
 		<p><a href="https://scontent-gmp1-1.xx.fbcdn.net/v/t1.6435-9/90560345_3009242059140280_746351048439889920_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_ohc=HXgALtTC39gQ7kNvgFhJWeB&_nc_ht=scontent-gmp1-1.xx&oh=00_AYDLWGDVRvc_dd04fqzbNUde8HWAC4dEgHpmHZyozk568g&oe=669F4795" target="_blank" >분석할 그림 소스</a></p>
 		
+		---------------------
+		
+		<div class="layout">  <!--enctype="multipart/form-data" 파일이나 이미지를 서버로 전송할 때 주로 사용-->
+	        <form action="/print/upfile" method="post" enctype="multipart/form-data">
+	            
+				<input name="param" type="text" placeholder="제목">
+	          <!--  <textarea name="content" placeholder="본문입력"></textarea>
+	          -->
+	            <input type="file" name="file">
+	          
+	            <button type="submit">작성</button>
+	        </form>
+	    </div>
+    
+    
+		
+		
 	</body>
 
 </html>
